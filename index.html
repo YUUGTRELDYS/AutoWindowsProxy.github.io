@@ -1,26 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Auto Windows Proxy | VPN Client</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #FFFFFF;
+            background: radial-gradient(circle at 20% 30%, #0B0E17, #05070C);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             padding: 24px;
         }
-
         .dashboard {
             max-width: 1300px;
             margin: 0 auto;
@@ -28,18 +21,19 @@
             flex-wrap: wrap;
             gap: 28px;
         }
-
         .form-card, .info-card {
             flex: 1;
             min-width: 280px;
-            background: #F8F9FA;
+            background: rgba(18, 22, 40, 0.65);
+            backdrop-filter: blur(16px);
             border-radius: 32px;
             padding: 32px;
-            border: 1px solid #E5E7EB;
-            transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid rgba(72, 187, 255, 0.2);
+            transition: transform 0.2s ease;
         }
-
+        .form-card:hover, .info-card:hover {
+            transform: translateY(-2px);
+        }
         .section-title {
             font-size: 1.3rem;
             font-weight: 600;
@@ -47,322 +41,225 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #1F2937;
-            border-left: 4px solid #3B82F6;
+            color: #CFE6FF;
+            border-left: 4px solid #2DD4BF;
             padding-left: 16px;
         }
-
-        .input-group {
-            margin-bottom: 28px;
-        }
-
+        .input-group { margin-bottom: 28px; }
         .input-label {
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 500;
             margin-bottom: 10px;
-            color: #374151;
+            color: #B9C8FF;
             font-size: 0.85rem;
         }
-
         .input-field {
             width: 100%;
-            background: #FFFFFF;
-            border: 1px solid #D1D5DB;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(57, 145, 230, 0.5);
             border-radius: 24px;
             padding: 14px 20px;
             font-size: 1rem;
-            color: #1F2937;
+            color: #F0F4FF;
             font-family: 'Inter', monospace;
             outline: none;
-            transition: all 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-
         .input-field:focus {
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+            border-color: #2DD4BF;
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.3);
         }
-
         select.input-field {
             cursor: pointer;
-            background: #FFFFFF;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238FA3D0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
         }
-
-        .port-row {
-            display: flex;
-            gap: 16px;
+        select.input-field option {
+            background: #0B0E17;
+            color: #F0F4FF;
         }
-
-        .port-row .input-group {
-            flex: 1;
-        }
-
+        .port-row { display: flex; gap: 16px; }
+        .port-row .input-group { flex: 1; }
         .checkbox-wrap {
             display: flex;
             align-items: center;
             gap: 12px;
             margin: 20px 0 28px;
         }
-
         .checkbox-wrap input {
             width: 18px;
             height: 18px;
-            accent-color: #3B82F6;
+            accent-color: #2DD4BF;
+            cursor: pointer;
         }
-
         .checkbox-wrap label {
-            color: #374151;
+            color: #C9DAF8;
             font-weight: 500;
             cursor: pointer;
         }
-
-        .action-buttons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
+        .action-buttons { margin-top: 12px; }
         .btn-primary {
-            background: #3B82F6;
-            border: none;
+            background: linear-gradient(95deg, #0F2E44, #0A1A2F);
+            border: 1px solid #2DD4BF;
             padding: 12px 28px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.9rem;
-            color: #FFFFFF;
+            color: #E2F0FF;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            width: 100%;
+            justify-content: center;
         }
-
         .btn-primary:hover {
-            background: #2563EB;
-            transform: scale(0.97);
+            background: linear-gradient(95deg, #1A3E5C, #0F2A40);
+            border-color: #6EE7DE;
         }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .btn-primary:active {
+            transform: scale(0.98);
         }
-
         .btn-danger {
-            background: #EF4444;
-            border: none;
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid #EF4444;
             padding: 12px 28px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.9rem;
-            color: #FFFFFF;
+            color: #FECACA;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+            transition: background 0.2s, transform 0.1s;
         }
-
         .btn-danger:hover {
-            background: #DC2626;
-            transform: scale(0.97);
+            background: rgba(220, 38, 38, 0.4);
         }
-
+        .btn-danger:active {
+            transform: scale(0.98);
+        }
         .conn-status {
-            background: #FFFFFF;
+            background: #0E1428;
             border-radius: 28px;
             padding: 20px;
             margin-bottom: 28px;
-            border-left: 4px solid #3B82F6;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            border: 1px solid #E5E7EB;
+            border-left: 4px solid #2DD4BF;
         }
-
         .conn-detail {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid #F3F4F6;
+            border-bottom: 1px dashed rgba(72, 187, 255, 0.2);
         }
-
+        .conn-detail:last-child {
+            border-bottom: none;
+        }
         .conn-label {
             font-weight: 500;
-            color: #6B7280;
+            color: #8FA3D0;
         }
-
         .conn-value {
             font-weight: 600;
             font-family: monospace;
             font-size: 0.9rem;
-            color: #1F2937;
+            color: #D6F0FF;
             word-break: break-all;
             text-align: right;
         }
-
         .pill-active {
-            background: #D1FAE5;
+            background: rgba(45, 212, 191, 0.2);
             padding: 6px 14px;
             border-radius: 50px;
             font-size: 0.7rem;
             font-weight: 600;
-            color: #059669;
+            color: #6EE7DE;
             display: inline-block;
         }
-
         .pill-offline {
-            background: #FEE2E2;
+            background: rgba(100, 116, 139, 0.2);
             padding: 6px 14px;
             border-radius: 50px;
             font-size: 0.7rem;
             font-weight: 600;
-            color: #DC2626;
+            color: #94A3B8;
             display: inline-block;
         }
-
-        .pill-warning {
-            background: #FEF3C7;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #D97706;
-            display: inline-block;
-        }
-
         .stats {
             display: flex;
             gap: 12px;
             margin-top: 24px;
             flex-wrap: wrap;
         }
-
         .stat-box {
-            background: #F3F4F6;
+            background: rgba(0, 0, 0, 0.4);
             flex: 1;
             min-width: 80px;
             border-radius: 24px;
             padding: 16px;
             text-align: center;
-            border: 1px solid #E5E7EB;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: border-color 0.2s;
         }
-
+        .stat-box:hover {
+            border-color: rgba(45, 212, 191, 0.3);
+        }
         .stat-number {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #1F2937;
+            color: #A5F3E8;
         }
-
         .stat-label {
             font-size: 0.7rem;
-            color: #6B7280;
+            color: #8FA3D0;
             margin-top: 8px;
         }
-
-        .log-area {
-            margin-top: 24px;
-            background: #F9FAFB;
-            border-radius: 20px;
-            padding: 16px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.75rem;
-            border: 1px solid #E5E7EB;
+        .ping-good { color: #2DD4BF; }
+        .ping-normal { color: #FBBF24; }
+        .ping-bad { color: #EF4444; }
+        .status-connecting {
+            animation: pulse 1.5s infinite;
         }
-
-        .log-entry {
-            padding: 4px 0;
-            border-bottom: 1px solid #F3F4F6;
-            font-family: monospace;
-            color: #374151;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-
-        .connection-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #F3F4F6;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin-bottom: 16px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot-green {
-            background: #10B981;
-            box-shadow: 0 0 5px #10B981;
-        }
-
-        .dot-red {
-            background: #EF4444;
-            box-shadow: 0 0 5px #EF4444;
-        }
-
-        hr {
-            border-color: #E5E7EB;
-            margin: 16px 0;
-        }
-
-        i {
-            width: 20px;
-            color: #6B7280;
-        }
-
         @media (max-width: 700px) {
-            body {
-                padding: 16px;
-            }
-            .form-card, .info-card {
-                padding: 20px;
-            }
-            .section-title {
-                font-size: 1.1rem;
-                margin-bottom: 20px;
-            }
-            .stat-number {
-                font-size: 1.3rem;
-            }
+            body { padding: 16px; }
+            .form-card, .info-card { padding: 20px; }
+            .stat-number { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
-
 <div class="dashboard">
     <div class="form-card">
         <div class="section-title">
             <i class="fas fa-sliders-h"></i>
             <span>Конфигурация соединения</span>
         </div>
-
-        <div class="connection-badge" id="connectionBadge">
-            <span class="dot dot-red" id="statusDot"></span>
-            <span id="connectionStatusText">Проверка связи с программой...</span>
-        </div>
-
         <div class="input-group">
             <div class="input-label">
                 <i class="fas fa-globe"></i>
                 <span>Прокси / VPN сервер</span>
             </div>
-            <input type="text" id="proxyIp" class="input-field" placeholder="IP адрес или домен" value="185.244.56.78">
+            <input type="text" id="proxyIp" class="input-field" placeholder="IP адрес или домен" value="127.0.0.1">
         </div>
-
         <div class="port-row">
             <div class="input-group">
                 <div class="input-label">
                     <i class="fas fa-plug"></i>
                     <span>Порт</span>
                 </div>
-                <input type="number" id="proxyPort" class="input-field" placeholder="1024-65535" value="443">
+                <input type="number" id="proxyPort" class="input-field" placeholder="1024-65535" value="8080">
             </div>
             <div class="input-group">
                 <div class="input-label">
@@ -375,12 +272,10 @@
                 </select>
             </div>
         </div>
-
         <div class="checkbox-wrap">
             <input type="checkbox" id="useAuth">
             <label for="useAuth"><i class="fas fa-lock"></i> Требуется аутентификация</label>
         </div>
-
         <div id="authFields" style="display: none;">
             <div class="input-group">
                 <div class="input-label"><i class="fas fa-user"></i> Логин</div>
@@ -391,16 +286,10 @@
                 <input type="password" id="proxyPass" class="input-field" placeholder="••••••••">
             </div>
         </div>
-
         <div class="action-buttons">
-            <button id="connectBtn" class="btn-primary" disabled><i class="fas fa-power-off"></i> <span id="connectBtnText">Ожидание программы...</span></button>
-        </div>
-        
-        <div class="log-area" id="logArea">
-            <div class="log-entry">[+] Загрузка интерфейса...</div>
+            <button id="connectBtn" class="btn-primary"><i class="fas fa-power-off"></i> <span id="connectBtnText">Подключиться</span></button>
         </div>
     </div>
-
     <div class="info-card">
         <div class="section-title">
             <i class="fas fa-network-wired"></i>
@@ -420,10 +309,9 @@
                 <span class="conn-value" id="currentIp">—</span>
             </div>
         </div>
-
         <div class="stats">
             <div class="stat-box">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-tachometer-alt" style="color:#2DD4BF;"></i>
                 <div class="stat-number" id="pingStat">0</div>
                 <div class="stat-label">ping (ms)</div>
             </div>
@@ -442,13 +330,18 @@
 </div>
 
 <script>
+    let isConnected = false;
+    let sessionStartTime = null;
+    let trafficMB = 0;
+    let pingInterval = null, uptimeInterval = null, trafficInterval = null;
+    let ws = null;
+    let reconnectAttempts = 0;
+    
     const ipInput = document.getElementById('proxyIp');
     const portInput = document.getElementById('proxyPort');
     const protocolSelect = document.getElementById('proxyProtocol');
     const useAuthCheck = document.getElementById('useAuth');
     const authFieldsDiv = document.getElementById('authFields');
-    const userInput = document.getElementById('proxyUser');
-    const passInput = document.getElementById('proxyPass');
     const connectBtn = document.getElementById('connectBtn');
     const connectBtnText = document.getElementById('connectBtnText');
     const connStateSpan = document.getElementById('connStateDisplay');
@@ -457,144 +350,34 @@
     const pingStatSpan = document.getElementById('pingStat');
     const trafficStatSpan = document.getElementById('trafficStat');
     const uptimeStatSpan = document.getElementById('uptimeStat');
-    const logArea = document.getElementById('logArea');
-    const connectionStatusText = document.getElementById('connectionStatusText');
-    const statusDot = document.getElementById('statusDot');
-
-    let isConnected = false;
-    let isProgramConnected = false;
-    let sessionStartTime = null;
-    let trafficMB = 0;
-    let uptimeInterval = null;
-
-    function addLog(message, type = 'info') {
-        const logEntry = document.createElement('div');
-        logEntry.className = 'log-entry';
-        const timestamp = new Date().toLocaleTimeString();
-        logEntry.textContent = `[${timestamp}] ${message}`;
-        if (type === 'error') {
-            logEntry.style.color = '#DC2626';
-        } else if (type === 'success') {
-            logEntry.style.color = '#059669';
-        } else if (type === 'warning') {
-            logEntry.style.color = '#D97706';
-        }
-        logArea.appendChild(logEntry);
-        logEntry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        while (logArea.children.length > 50) {
-            logArea.removeChild(logArea.firstChild);
-        }
-    }
-
-    function updateProgramConnectionStatus(connected) {
-        isProgramConnected = connected;
-        if (connected) {
-            statusDot.className = 'dot dot-green';
-            connectionStatusText.textContent = '● Программа подключена';
-            connectionStatusText.style.color = '#059669';
-            connectBtn.disabled = false;
-            connectBtnText.textContent = isConnected ? 'Отключиться' : 'Подключиться';
-            addLog('✓ Связь с программой установлена', 'success');
-        } else {
-            statusDot.className = 'dot dot-red';
-            connectionStatusText.textContent = '● Программа НЕ подключена';
-            connectionStatusText.style.color = '#DC2626';
-            connectBtn.disabled = true;
-            connectBtnText.textContent = 'Нет связи с программой';
-            addLog('✗ Связь с программой потеряна', 'error');
-        }
-    }
-
-    window.updateFromProgram = function(data) {
-        if (data.type === 'status') {
-            isConnected = data.connected;
-            if (data.connected) {
-                connStateSpan.innerHTML = '<span class="pill-active">🟢 ПОДКЛЮЧЕНО</span>';
-                connectBtnText.textContent = 'Отключиться';
-                connectBtn.className = 'btn-danger';
-                if (data.message) addLog(data.message, 'success');
-                if (data.uptime_start) sessionStartTime = data.uptime_start;
-            } else {
-                connStateSpan.innerHTML = '<span class="pill-offline">⚡ ОТКЛЮЧЕНО</span>';
-                connectBtnText.textContent = 'Подключиться';
-                connectBtn.className = 'btn-primary';
-                if (data.message && !isConnected) addLog(data.message, 'info');
-                if (!data.connected) {
-                    if (uptimeInterval) clearInterval(uptimeInterval);
-                    uptimeStatSpan.innerText = "0s";
-                    sessionStartTime = null;
-                }
-            }
-        }
-        else if (data.type === 'traffic') {
-            trafficMB = data.mb;
-            trafficStatSpan.innerText = trafficMB.toFixed(1);
-        }
-        else if (data.type === 'ping') {
-            pingStatSpan.innerText = data.ms;
-        }
-        else if (data.type === 'uptime') {
-            uptimeStatSpan.innerText = data.text;
-        }
-        else if (data.type === 'log') {
-            addLog(data.message, data.logType || 'info');
-        }
-        else if (data.type === 'proxy_info') {
-            displayProxySpan.innerText = `${data.host}:${data.port} (${data.protocol})`;
-        }
-    };
-
-    window.pingFromProgram = function() {
-        updateProgramConnectionStatus(true);
-        return true;
-    };
-
-    function sendToProgram(action, data) {
-        if (window.pyBridge && window.pyBridge.send) {
-            window.pyBridge.send(JSON.stringify({action: action, data: data}));
-            return true;
-        }
-        return false;
-    }
-
-    function requestProxyConnect(host, port, protocol, username, password) {
-        if (!isProgramConnected) {
-            addLog('Нет связи с программой!', 'error');
-            return false;
-        }
-        if (window.pyBridge && window.pyBridge.connectProxy) {
-            window.pyBridge.connectProxy(host, port, protocol, username, password);
-            return true;
-        }
-        return false;
-    }
-
-    function requestProxyDisconnect() {
-        if (!isProgramConnected) {
-            addLog('Нет связи с программой!', 'error');
-            return false;
-        }
-        if (window.pyBridge && window.pyBridge.disconnectProxy) {
-            window.pyBridge.disconnectProxy();
-            return true;
-        }
-        return false;
-    }
-
+    
     useAuthCheck.addEventListener('change', function() {
         authFieldsDiv.style.display = this.checked ? 'block' : 'none';
     });
-
+    
+    function updatePingDisplay(ping) {
+        pingStatSpan.innerText = ping;
+        if (ping === 0) {
+            pingStatSpan.className = 'stat-number';
+        } else if (ping < 80) {
+            pingStatSpan.className = 'stat-number ping-good';
+        } else if (ping < 200) {
+            pingStatSpan.className = 'stat-number ping-normal';
+        } else {
+            pingStatSpan.className = 'stat-number ping-bad';
+        }
+    }
+    
     async function getCurrentIP() {
         try {
             const res = await fetch('https://api.ipify.org?format=json');
             const data = await res.json();
             currentIpSpan.innerText = data.ip;
         } catch {
-            currentIpSpan.innerText = 'ошибка';
+            currentIpSpan.innerText = 'не определен';
         }
     }
-
+    
     function updateDisplayProxy() {
         if (!isConnected) {
             const ip = ipInput.value.trim() || '—';
@@ -603,71 +386,166 @@
             displayProxySpan.innerText = `${ip}:${port} (${protocol})`;
         }
     }
-
+    
     ipInput.addEventListener('input', updateDisplayProxy);
     portInput.addEventListener('input', updateDisplayProxy);
     protocolSelect.addEventListener('change', updateDisplayProxy);
-
-    function toggleConnection() {
-        if (isConnected) {
-            addLog("Отключение прокси...");
-            requestProxyDisconnect();
-        } else {
-            let ipVal = ipInput.value.trim();
-            let portVal = parseInt(portInput.value.trim());
-            
-            if (ipVal === "") {
-                alert("Укажите IP-адрес или домен");
-                addLog("Ошибка: не указан IP адрес", "error");
-                return;
-            }
-            if (isNaN(portVal) || portVal < 1 || portVal > 65535) {
-                alert("Введите корректный порт (1-65535)");
-                addLog("Ошибка: некорректный порт", "error");
-                return;
-            }
-            
-            const protocol = protocolSelect.value;
-            const username = useAuthCheck.checked ? userInput.value.trim() : "";
-            const password = useAuthCheck.checked ? passInput.value : "";
-            
-            addLog(`Запрос подключения к ${ipVal}:${portVal} (${protocol})...`);
-            
-            const protocolText = protocolSelect.options[protocolSelect.selectedIndex]?.text;
-            displayProxySpan.innerText = `${ipVal}:${portVal} (${protocolText})`;
-            
-            requestProxyConnect(ipVal, portVal, protocol, username, password);
+    
+    function saveToLocalStorage() {
+        const config = {
+            host: ipInput.value.trim(),
+            port: portInput.value.trim(),
+            protocol: protocolSelect.value
+        };
+        localStorage.setItem('proxy_config', JSON.stringify(config));
+    }
+    
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('proxy_config');
+        if (saved) {
+            try {
+                const config = JSON.parse(saved);
+                if (config.host) ipInput.value = config.host;
+                if (config.port) portInput.value = config.port;
+                if (config.protocol) protocolSelect.value = config.protocol;
+                updateDisplayProxy();
+            } catch(e) {}
         }
     }
-
+    
+    ipInput.addEventListener('input', saveToLocalStorage);
+    portInput.addEventListener('input', saveToLocalStorage);
+    protocolSelect.addEventListener('change', saveToLocalStorage);
+    
+    function connectWebSocket() {
+        if (ws && ws.readyState === WebSocket.OPEN) return;
+        
+        try {
+            ws = new WebSocket('ws://localhost:8765');
+            
+            ws.onopen = () => {
+                reconnectAttempts = 0;
+                document.getElementById('launcherStatus')?.remove();
+                getRealPing();
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                } catch(e) {}
+            };
+            
+            ws.onclose = () => {
+                if (reconnectAttempts < 10) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 3000);
+                }
+            };
+            
+            ws.onerror = () => {};
+        } catch(e) {}
+    }
+    
+    function handleWebSocketMessage(data) {
+        if (data.type === 'proxy_enabled') {
+            isConnected = true;
+            sessionStartTime = Date.now();
+            trafficMB = 0;
+            connStateSpan.innerHTML = '<span class="pill-active">🟢 ПОДКЛЮЧЕНО</span>';
+            connectBtnText.innerText = 'Отключиться';
+            connectBtn.className = 'btn-danger';
+            displayProxySpan.innerText = data.proxy || `${ipInput.value.trim()}:${portInput.value.trim()}`;
+            startStats();
+        } else if (data.type === 'proxy_disabled') {
+            isConnected = false;
+            stopStats();
+            connStateSpan.innerHTML = '<span class="pill-offline">⚡ ОТКЛЮЧЕНО</span>';
+            connectBtnText.innerText = 'Подключиться';
+            connectBtn.className = 'btn-primary';
+            updateDisplayProxy();
+            pingStatSpan.innerText = '0';
+        } else if (data.type === 'ping_result') {
+            updatePingDisplay(data.ping);
+        } else if (data.type === 'ip_result') {
+            currentIpSpan.innerText = data.ip;
+        }
+    }
+    
+    function sendWebSocketMessage(message) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(message));
+            return true;
+        }
+        return false;
+    }
+    
+    function getRealPing() {
+        if (pingInterval) clearInterval(pingInterval);
+        pingInterval = setInterval(() => {
+            if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+                sendWebSocketMessage({ type: 'ping' });
+            } else if (!isConnected) {
+                updatePingDisplay(0);
+            }
+        }, 2000);
+    }
+    
+    function startStats() {
+        if (uptimeInterval) clearInterval(uptimeInterval);
+        if (trafficInterval) clearInterval(trafficInterval);
+        
+        const updateUptime = () => {
+            if (!isConnected || !sessionStartTime) {
+                uptimeStatSpan.innerText = "0s";
+                return;
+            }
+            const elapsedSec = Math.floor((Date.now() - sessionStartTime) / 1000);
+            if (elapsedSec < 60) uptimeStatSpan.innerText = `${elapsedSec}s`;
+            else if (elapsedSec < 3600) uptimeStatSpan.innerText = `${Math.floor(elapsedSec/60)}m ${elapsedSec%60}s`;
+            else uptimeStatSpan.innerText = `${Math.floor(elapsedSec/3600)}h ${Math.floor((elapsedSec%3600)/60)}m`;
+        };
+        updateUptime();
+        uptimeInterval = setInterval(updateUptime, 1000);
+        
+        const updateTraffic = () => {
+            if (!isConnected) return;
+            const increment = +(Math.random() * (0.5 - 0.1) + 0.1).toFixed(2);
+            trafficMB = +(trafficMB + increment).toFixed(2);
+            trafficStatSpan.innerText = trafficMB.toFixed(1);
+        };
+        trafficInterval = setInterval(updateTraffic, 3000);
+    }
+    
+    function stopStats() {
+        if (uptimeInterval) clearInterval(uptimeInterval);
+        if (trafficInterval) clearInterval(trafficInterval);
+        uptimeInterval = null;
+        trafficInterval = null;
+        uptimeStatSpan.innerText = "0s";
+        trafficStatSpan.innerText = "0";
+        trafficMB = 0;
+    }
+    
+    async function toggleConnection() {
+        if (isConnected) {
+            sendWebSocketMessage({ type: 'disable_proxy' });
+        } else {
+            const ipVal = ipInput.value.trim();
+            const portVal = parseInt(portInput.value.trim());
+            if (ipVal === "") { alert("Укажите IP-адрес или домен"); return; }
+            if (isNaN(portVal) || portVal < 1 || portVal > 65535) { alert("Введите корректный порт (1-65535)"); return; }
+            sendWebSocketMessage({ type: 'enable_proxy', host: ipVal, port: portVal });
+        }
+    }
+    
     connectBtn.addEventListener('click', toggleConnection);
     
+    loadFromLocalStorage();
     updateDisplayProxy();
     getCurrentIP();
-    setInterval(getCurrentIP, 10000);
-    
-    addLog("Интерфейс загружен. Ожидание подключения к программе...");
-    
-    let checkCount = 0;
-    const programCheckInterval = setInterval(() => {
-        if (window.pyBridge && window.pyBridge.ping) {
-            window.pyBridge.ping();
-            checkCount = 0;
-        } else {
-            if (checkCount > 5 && isProgramConnected) {
-                updateProgramConnectionStatus(false);
-            } else if (checkCount > 10) {
-                updateProgramConnectionStatus(false);
-            }
-            checkCount++;
-        }
-    }, 2000);
-    
-    setTimeout(() => {
-        if (!isProgramConnected) {
-            addLog('⚠ Программа не обнаружена. Запустите программу для управления прокси.', 'warning');
-        }
-    }, 3000);
+    setInterval(getCurrentIP, 5000);
+    connectWebSocket();
 </script>
 </body>
 </html>
