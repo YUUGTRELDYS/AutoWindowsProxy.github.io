@@ -147,6 +147,12 @@
         .btn-danger:active {
             transform: scale(0.98);
         }
+        .btn-connecting {
+            background: linear-gradient(95deg, #2c3e50, #1a2a3a);
+            border: 1px solid #FBBF24;
+            color: #FBBF24;
+            cursor: wait;
+        }
         .conn-status {
             background: #0E1428;
             border-radius: 28px;
@@ -193,6 +199,16 @@
             color: #94A3B8;
             display: inline-block;
         }
+        .pill-connecting {
+            background: rgba(251, 191, 36, 0.2);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #FBBF24;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
         .stats {
             display: flex;
             gap: 12px;
@@ -232,6 +248,13 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
         @media (max-width: 700px) {
             body { padding: 16px; }
             .form-card, .info-card { padding: 20px; }
@@ -259,7 +282,7 @@
                     <i class="fas fa-plug"></i>
                     <span>Порт</span>
                 </div>
-                <input type="number" id="proxyPort" class="input-field" placeholder="1024-65535" value="8080">
+                <input type="number" id="proxyPort" class="input-field" placeholder="1024-65535" value="1085">
             </div>
             <div class="input-group">
                 <div class="input-label">
@@ -331,11 +354,14 @@
 
 <script>
     let isConnected = false;
+    let isConnecting = false;
     let sessionStartTime = null;
     let trafficMB = 0;
     let pingInterval = null, uptimeInterval = null, trafficInterval = null;
     let ws = null;
     let reconnectAttempts = 0;
+    let connectionCheckInterval = null;
+    let failedConnectionAttempts = 0;
     
     const ipInput = document.getElementById('proxyIp');
     const portInput = document.getElementById('proxyPort');
@@ -370,16 +396,71 @@
     
     async function getCurrentIP() {
         try {
-            const res = await fetch('https://api.ipify.org?format=json');
+            const res = await fetch('https://api.ipify.org?format=json', { timeout: 5000 });
             const data = await res.json();
             currentIpSpan.innerText = data.ip;
+            return data.ip;
         } catch {
             currentIpSpan.innerText = 'не определен';
+            return null;
         }
     }
     
+    async function testProxyConnection(host, port) {
+        return new Promise((resolve) => {
+            const timeout = setTimeout(() => resolve(false), 5000);
+            try {
+                fetch(`http://${host}:${port}`, {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-cache'
+                }).then(() => {
+                    clearTimeout(timeout);
+                    resolve(true);
+                }).catch(() => {
+                    clearTimeout(timeout);
+                    resolve(false);
+                });
+            } catch(e) {
+                clearTimeout(timeout);
+                resolve(false);
+            }
+        });
+    }
+    
+    async function checkProxyWorks() {
+        if (!isConnected) return false;
+        
+        const currentIpBefore = currentIpSpan.innerText;
+        await new Promise(r => setTimeout(r, 1000));
+        const newIp = await getCurrentIP();
+        
+        if (newIp && currentIpBefore !== newIp && newIp !== 'не определен') {
+            failedConnectionAttempts = 0;
+            return true;
+        }
+        
+        failedConnectionAttempts++;
+        if (failedConnectionAttempts >= 3) {
+            console.log('Proxy connection lost, reconnecting...');
+            await forceReconnect();
+        }
+        return false;
+    }
+    
+    async function forceReconnect() {
+        if (!isConnected) return;
+        
+        const host = ipInput.value.trim();
+        const port = parseInt(portInput.value.trim());
+        
+        sendWebSocketMessage({ type: 'disable_proxy' });
+        await new Promise(r => setTimeout(r, 1000));
+        sendWebSocketMessage({ type: 'enable_proxy', host: host, port: port });
+    }
+    
     function updateDisplayProxy() {
-        if (!isConnected) {
+        if (!isConnected && !isConnecting) {
             const ip = ipInput.value.trim() || '—';
             const port = portInput.value.trim() || '—';
             const protocol = protocolSelect.options[protocolSelect.selectedIndex]?.text || '—';
@@ -425,7 +506,6 @@
             
             ws.onopen = () => {
                 reconnectAttempts = 0;
-                document.getElementById('launcherStatus')?.remove();
                 getRealPing();
             };
             
@@ -449,27 +529,52 @@
     
     function handleWebSocketMessage(data) {
         if (data.type === 'proxy_enabled') {
-            isConnected = true;
-            sessionStartTime = Date.now();
-            trafficMB = 0;
-            connStateSpan.innerHTML = '<span class="pill-active">🟢 ПОДКЛЮЧЕНО</span>';
-            connectBtnText.innerText = 'Отключиться';
-            connectBtn.className = 'btn-danger';
-            displayProxySpan.innerText = data.proxy || `${ipInput.value.trim()}:${portInput.value.trim()}`;
-            startStats();
+            if (data.success) {
+                startConnectionCheck();
+                isConnected = true;
+                isConnecting = false;
+                sessionStartTime = Date.now();
+                trafficMB = 0;
+                failedConnectionAttempts = 0;
+                connStateSpan.innerHTML = '<span class="pill-active">🟢 ПОДКЛЮЧЕНО</span>';
+                connectBtnText.innerText = 'Отключиться';
+                connectBtn.className = 'btn-danger';
+                displayProxySpan.innerText = data.proxy || `${ipInput.value.trim()}:${portInput.value.trim()}`;
+                startStats();
+                connectBtn.disabled = false;
+            } else {
+                isConnecting = false;
+                connectBtn.disabled = false;
+                connectBtn.className = 'btn-primary';
+                connectBtnText.innerText = 'Подключиться';
+                alert('Ошибка подключения к прокси. Проверьте адрес и порт.');
+            }
         } else if (data.type === 'proxy_disabled') {
             isConnected = false;
+            isConnecting = false;
             stopStats();
+            if (connectionCheckInterval) clearInterval(connectionCheckInterval);
             connStateSpan.innerHTML = '<span class="pill-offline">⚡ ОТКЛЮЧЕНО</span>';
             connectBtnText.innerText = 'Подключиться';
             connectBtn.className = 'btn-primary';
+            connectBtn.disabled = false;
             updateDisplayProxy();
             pingStatSpan.innerText = '0';
+            failedConnectionAttempts = 0;
         } else if (data.type === 'ping_result') {
             updatePingDisplay(data.ping);
         } else if (data.type === 'ip_result') {
             currentIpSpan.innerText = data.ip;
         }
+    }
+    
+    function startConnectionCheck() {
+        if (connectionCheckInterval) clearInterval(connectionCheckInterval);
+        connectionCheckInterval = setInterval(() => {
+            if (isConnected) {
+                checkProxyWorks();
+            }
+        }, 5000);
     }
     
     function sendWebSocketMessage(message) {
@@ -528,6 +633,8 @@
     }
     
     async function toggleConnection() {
+        if (isConnecting) return;
+        
         if (isConnected) {
             sendWebSocketMessage({ type: 'disable_proxy' });
         } else {
@@ -535,7 +642,27 @@
             const portVal = parseInt(portInput.value.trim());
             if (ipVal === "") { alert("Укажите IP-адрес или домен"); return; }
             if (isNaN(portVal) || portVal < 1 || portVal > 65535) { alert("Введите корректный порт (1-65535)"); return; }
+            
+            isConnecting = true;
+            connectBtn.disabled = true;
+            connectBtn.className = 'btn-connecting';
+            connectBtnText.innerHTML = '<i class="fas fa-spinner"></i> ПОДКЛЮЧЕНИЕ...';
+            connStateSpan.innerHTML = '<span class="pill-connecting">⏳ ПОДКЛЮЧЕНИЕ...</span>';
+            
             sendWebSocketMessage({ type: 'enable_proxy', host: ipVal, port: portVal });
+            
+            setTimeout(() => {
+                if (isConnecting) {
+                    isConnecting = false;
+                    connectBtn.disabled = false;
+                    connectBtn.className = 'btn-primary';
+                    connectBtnText.innerText = 'Подключиться';
+                    if (!isConnected) {
+                        connStateSpan.innerHTML = '<span class="pill-offline">⚡ ОТКЛЮЧЕНО</span>';
+                        alert('Превышено время ожидания подключения (5 секунд). Проверьте прокси.');
+                    }
+                }
+            }, 5000);
         }
     }
     
